@@ -15,7 +15,8 @@ import {
   Switch,
   Alert,
   Table,
-  Upload
+  Upload,
+  Tag
 } from 'antd';
 import axios from 'axios'
 import copy from 'copy-to-clipboard';
@@ -643,7 +644,13 @@ function Sites() {
         title: '站源',
         dataIndex: 'key',
         render(value, record) {
-          return record.name
+          return (
+            <>
+              {record.name}
+              {record.t4 && <Tag style={{marginLeft: 4}} color="blue">T4</Tag>}
+              {record.cms && <Tag style={{marginLeft: 4}} color="blue">CMS</Tag>}
+            </>
+          )
         }
       },
       {
@@ -737,6 +744,8 @@ function Sites() {
           key: site.key,
           name: site.name,
           enable: true,
+          t4: site.t4,
+          cms: site.cms,
         })
       }
     })
@@ -749,7 +758,17 @@ function Sites() {
       await http.put('/sites/list', {
         list: dataSource
       })
-      message.success('设置成功')
+      message.success({
+        content: (
+          <>
+            设置成功<br/>
+            需重新加载源！<br/>
+            需重新加载源！<br/>
+            需重新加载源！<br/>
+          </>
+        ),
+        duration: 5
+      })
     } catch (e) {
       console.error(e);
       message.error(`设置失败：${e?.message}`)
@@ -786,6 +805,7 @@ function Sites() {
             columns={columns}
             dataSource={dataSource}
             pagination={false}
+            className={'sites-table'}
           />
         </SortableContext>
       </DndContext>
@@ -1058,6 +1078,230 @@ function DanmuSetting() {
   )
 }
 
+function T4() {
+  const [form] = Form.useForm();
+  const formItemLayout = {
+    labelCol: { span: 0 },
+    wrapperCol: { span: 24 },
+  };
+  const formItemLayoutWithOutLabel = {
+    wrapperCol: { span: 24, offset: 0 },
+  };
+  const api = '/t4/list'
+
+  const init = async () => {
+    const list = await http.get(api)
+    form.setFieldsValue({list})
+  }
+
+  const submit = async () => {
+    const data = await form.validateFields()
+    try {
+      await http.put(api, data.list)
+      message.success({
+        content: (
+          <>
+            保存成功<br/>
+            需重新加载源！<br/>
+            需重新加载源！<br/>
+            需重新加载源！<br/>
+          </>
+        ),
+        duration: 5
+      })
+    } catch (e) {
+      console.error(e)
+      message.error(`保存失败：${e?.message}`)
+    }
+  }
+
+  const reset = async () => {
+    try {
+      await http.delete(api)
+      init()
+      message.success('清空成功')
+    } catch (e) {
+      console.error(e);
+      message.error(`清空失败：${e?.message}`)
+    }
+  }
+
+  useEffect(() => {
+    init()
+  }, [])
+
+  return (
+    <Form form={form} {...formItemLayout}>
+      <Form.List name="list">
+        {(fields, { add, remove }, { errors }) => (
+          <>
+            {fields.map((field, index) => (
+              <Form.Item
+                required={false}
+                key={field.key}
+                {...formItemLayout}
+                style={{marginBottom: 12}}
+              >
+                <Form.Item
+                  {...field}
+                  name={[field.name, 'address']}
+                  validateTrigger={['onChange', 'onBlur']}
+                  rules={[
+                    {
+                      required: true,
+                      whitespace: true,
+                      message: `请输入T4接口地址`,
+                    },
+                  ]}
+                  noStyle
+                >
+                  <Input placeholder={`请输入T4接口地址`} style={{ width: '65%' }}/>
+                </Form.Item>
+                <Form.Item
+                  {...field}
+                  name={[field.name, 'name']}
+                  validateTrigger={['onChange', 'onBlur']}
+                  noStyle
+                  rules={[
+                    {
+                      required: true,
+                      whitespace: true,
+                      message: `请输入名称`,
+                    },
+                  ]}
+                >
+                  <Input placeholder={`名称`} style={{ width: '25%', marginLeft: 8 }}/>
+                </Form.Item>
+                <MinusCircleOutlined
+                  className="dynamic-delete-button"
+                  onClick={() => remove(field.name)}
+                />
+              </Form.Item>
+            ))}
+            <Form.Item label={''} {...formItemLayoutWithOutLabel}>
+              <Button
+                type="dashed"
+                onClick={() => add()}
+                style={{ width: '60%' }}
+                icon={<PlusOutlined />}
+              >
+                添加T4接口
+              </Button>
+              <Form.ErrorList errors={errors} />
+            </Form.Item>
+          </>
+        )}
+      </Form.List>
+      <Form.Item label={null}>
+        <Button type="primary" onClick={submit}>
+          保存
+        </Button>
+        <Button danger style={{marginLeft: 16}} onClick={reset}>清空</Button>
+      </Form.Item>
+    </Form>
+  )
+}
+
+function CMS() {
+  const api = '/cms/list'
+  const [url, setUrl] = useState('')
+  const [data, setData] = useState([])
+  const [getDataLoading, setGetDataLoading] = useState(false)
+  const columns = [
+    {
+      title: '名称',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'API',
+      dataIndex: 'address',
+      key: 'address',
+    },
+  ]
+
+  const init = async () => {
+    const list = await http.get(api)
+    setData(list)
+  }
+
+  const getData = async () => {
+    if (!url) {
+      message.error("请输入CMS接口地址")
+      return
+    }
+    setGetDataLoading(true)
+    try {
+      const {data} = await axios.get(url.trim())
+      if (data.sites.length) {
+        setData(
+          data.sites.map(item => {
+            return {
+              name: item.name,
+              address: item.api,
+            }
+          })
+        )
+      }
+    } catch (e) {
+      console.error(e)
+      message.error("接口解析失败")
+    }
+    setGetDataLoading(false)
+  }
+
+  const save = async () => {
+    try {
+      await http.put(api, data)
+      message.success({
+        content: (
+          <>
+            保存成功<br/>
+            需重新加载源！<br/>
+            需重新加载源！<br/>
+            需重新加载源！<br/>
+          </>
+        ),
+        duration: 5
+      })
+    } catch (e) {
+      console.error(e)
+      message.error(`保存失败：${e?.message}`)
+    }
+  }
+
+  const reset = async () => {
+    try {
+      await http.delete(api)
+      init()
+      message.success('清空成功')
+    } catch (e) {
+      console.error(e);
+      message.error(`清空失败：${e?.message}`)
+    }
+  }
+
+  useEffect(() => {
+    init()
+  }, [])
+
+  return (
+    <Form>
+      <Space.Compact style={{ width: '100%', marginBottom: 12 }}>
+        <Input defaultValue="输入XPTV CMS接口地址" value={url} onChange={(e) => setUrl(e.target.value)} />
+        <Button type="primary" onClick={getData} loading={getDataLoading}>识别</Button>
+      </Space.Compact>
+      <Table columns={columns} dataSource={data} pagination={false}/>
+      <Form.Item label={null} style={{marginTop: 16}}>
+        <Button type="primary" onClick={save}>
+          保存
+        </Button>
+        <Button danger style={{marginLeft: 16}} onClick={reset}>清空</Button>
+      </Form.Item>
+    </Form>
+  )
+}
+
 function App() {
   const props = {
     accept: ".json",
@@ -1133,9 +1377,15 @@ function App() {
             </Tabs>
           </TabPane>
           <TabPane tab="站源设置" key="site">
-            <Tabs>
+            <Tabs destroyOnHidden={true}>
               <TabPane tab="站源列表" key="sites">
                 <Sites/>
+              </TabPane>
+              <TabPane tab="T4接口" key="t4">
+                <T4/>
+              </TabPane>
+              <TabPane tab="XPTV-CMS接口" key="cms">
+                <CMS/>
               </TabPane>
               <TabPane tab="木偶域名" key="muou">
                 <SiteDomainSetting api={'/muou/urls'} name="木偶"/>

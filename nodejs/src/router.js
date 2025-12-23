@@ -13,8 +13,23 @@ import {getCache} from "./website/sites.js";
 import {getCache as getDanmuSetting} from "./website/danmu.js";
 import axios from "axios";
 import { extractTitle, findEpisodeNumber } from './util/danmu-utils.js';
+import {getCache as getT4} from "./website/t4.js";
+import T4Factory from "./spider/video/t4.js";
+import {getCache as getCMS} from "./website/cms.js";
+import CMSFactory from "./spider/video/cms.js";
 
-const spiders = [douban, duoduo, mogg, leijing, panta, wogg, zhizhen, tgchannel, tgsou, baseset, push];
+const getSpiders = async (server) => {
+    const spiders = [douban, duoduo, mogg, leijing, panta, wogg, zhizhen, tgchannel, tgsou, baseset, push];
+    const t4Data = await getT4(server)
+    t4Data.forEach(item => {
+        spiders.push(T4Factory(item.name, item.address))
+    })
+    const cmsData = await getCMS(server)
+    cmsData.forEach(item => {
+        spiders.push(CMSFactory(item.name, item.address))
+    })
+    return spiders
+}
 const spiderPrefix = '/spider';
 
 let danmuInfo = {};
@@ -25,8 +40,9 @@ let danmuInfo = {};
  * @param {Object} fastify - The Fastify instance
  * @return {Promise<void>} - A Promise that resolves when the router is initialized
  */
-export default async function router(fastify) {
+export default async function router(fastify, {db, config}) {
     // register all spider router
+    const spiders = await getSpiders({db, config});
     spiders.forEach((spider) => {
         const path = spiderPrefix + '/' + spider.meta.key + '/' + spider.meta.type;
         fastify.register(spider.api, { prefix: path });
@@ -53,7 +69,7 @@ export default async function router(fastify) {
                     reply.send({ run: !fastify.stop });
                 }
             );
-            const getConfig = () => {
+            const getConfig = async () => {
                 const config = {
                     video: {
                         sites: [],
@@ -72,6 +88,7 @@ export default async function router(fastify) {
                     },
                     color: fastify.config.color || [],
                 };
+                const spiders = await getSpiders({db, config});
                 spiders.forEach((spider) => {
                     let meta = Object.assign({}, spider.meta);
                     meta.api = spiderPrefix + '/' + meta.key + '/' + meta.type;
@@ -99,7 +116,7 @@ export default async function router(fastify) {
                  * @param {import('fastify').FastifyReply} reply
                  */
                 async function (_request, reply) {
-                    const config = getConfig()
+                    const config = await getConfig()
                     const sites = await getCache(_request.server)
 
                     const allSites = config.video.sites
@@ -128,10 +145,7 @@ export default async function router(fastify) {
                     reply.send(config);
                 }
             );
-            fastify.get('/full-config', (_, reply) => {
-                const config = getConfig()
-                reply.send(config);
-            })
+            fastify.get('/full-config', getConfig)
         }
     );
 
@@ -221,7 +235,16 @@ export default async function router(fastify) {
                     const data = JSON.parse(payload)
                     if ((data.url || data.url?.length || data.urls?.length) && !data?.extra?.danmaku) {
                         const key = `${request.body.flag}_${request.body.id}`
-                        const episodeInfo = danmuInfo[key]
+                        let episodeInfo = danmuInfo[key]
+                        if (episodeInfo && !episodeInfo?.name) {
+                            const playInfo = await messageToDart({
+                                action: 'getPlayInfo',
+                            })
+                            if (playInfo) {
+                                console.log('playInfo', playInfo)
+                                episodeInfo.name = playInfo?.title
+                            }
+                        }
                         if (episodeInfo) {
                             if (!data.extra) {
                                 data.extra = {}

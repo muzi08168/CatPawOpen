@@ -93,7 +93,7 @@ export async function start(config) {
               oldPush('/', allData || {})
           }
       });
-    server.register(router);
+    server.register(router, {db: server.db, config});
     server.register(website, { prefix: '/website' });
     globalThis.Pans = await getPansCache(server)
     globalThis.getPanName = (key) => globalThis.Pans.find(pan => pan.key === key)?.name

@@ -54,14 +54,14 @@ export default async function danmu(fastify) {
         <meta charset="utf-8">
         <title>弹幕搜索</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://lib.baomitu.com/antd/5.23.3/reset.min.css">      </head>
+        <link rel="stylesheet" href="https://lib.baomitu.com/antd/5.25.0/reset.min.css">      </head>
       <body>
         <div id="app"></div>
         <script crossorigin src="https://lib.baomitu.com/react/18.2.0/umd/react.production.min.js"></script>
         <script crossorigin src="https://lib.baomitu.com/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
         <script crossorigin src="https://lib.baomitu.com/axios/0.26.0/axios.min.js"></script>
         <script crossorigin src="https://lib.baomitu.com/dayjs/1.10.8/dayjs.min.js"></script>
-        <script crossorigin src="https://lib.baomitu.com/antd/5.23.3/antd.min.js"></script>
+        <script crossorigin src="https://lib.baomitu.com/antd/5.25.0/antd.min.js"></script>
         <script>${globalThis.danmuBundle}</script>
       </body>
     </html>

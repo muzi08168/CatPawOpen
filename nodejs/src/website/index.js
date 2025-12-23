@@ -15,6 +15,8 @@ import pans from "./pans.js";
 import backup from "./backup.js";
 import zhizhen from "./zhizhen.js";
 import danmu from "./danmu.js";
+import t4 from "./t4.js";
+import cms from "./cms.js";
 
 export default async function website(fastify) {
   fastify.get('/', (req, res) => {
@@ -31,8 +33,8 @@ export default async function website(fastify) {
         <script crossorigin src="https://lib.baomitu.com/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
         <script crossorigin src="https://lib.baomitu.com/axios/0.26.0/axios.min.js"></script>
         <script crossorigin src="https://lib.baomitu.com/dayjs/1.10.8/dayjs.min.js"></script>
-        <script crossorigin src="https://lib.baomitu.com/antd/5.23.3/antd.min.js"></script>
-        <link rel="stylesheet" href="https://lib.baomitu.com/antd/5.23.3/reset.min.css">
+        <script crossorigin src="https://lib.baomitu.com/antd/5.25.0/antd.min.js"></script>
+        <link rel="stylesheet" href="https://lib.baomitu.com/antd/5.25.0/reset.min.css">
         <script>${globalThis.websiteBundle}</script>
       </body>
     </html>
@@ -56,4 +58,6 @@ export default async function website(fastify) {
   fastify.register(pans, {prefix: '/pans'})
   fastify.register(backup, {prefix: '/backup'})
   fastify.register(danmu, {prefix: '/danmu'})
+  fastify.register(t4, {prefix: '/t4'})
+  fastify.register(cms, {prefix: '/cms'})
 }
