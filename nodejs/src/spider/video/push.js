@@ -19,7 +19,7 @@ async function detail(inReq, _outResp) {
             vod_name: id,
             vod_pic: 'https://pic.rmb.bdstatic.com/bjh/1d0b02d0f57f0a42201f92caba5107ed.jpeg',
         };
-        const vodFromUrl = await _detail(id);
+        const vodFromUrl = await _detail(id, inReq);
         if (vodFromUrl) {
             vod.vod_play_from = vodFromUrl.froms;
             vod.vod_play_url = vodFromUrl.urls;

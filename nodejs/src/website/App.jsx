@@ -1365,6 +1365,12 @@ function App() {
                   cacheUrl="/115/cookie"
                 />
               </TabPane>
+              <TabPane tab="百度" key="baidu">
+                <QrcodeCard
+                  qrcodeUrl="/website/baidu/qrcode"
+                  cacheUrl="/baidu/cookie"
+                />
+              </TabPane>
               <TabPane tab="阿里" key="ali">
                 <AliQrcodeCard />
               </TabPane>

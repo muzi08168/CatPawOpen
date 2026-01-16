@@ -40,9 +40,9 @@ let danmuInfo = {};
  * @param {Object} fastify - The Fastify instance
  * @return {Promise<void>} - A Promise that resolves when the router is initialized
  */
-export default async function router(fastify, {db, config}) {
+export default async function router(fastify, {db, config: serverConfig}) {
     // register all spider router
-    const spiders = await getSpiders({db, config});
+    const spiders = await getSpiders({db, config: serverConfig});
     spiders.forEach((spider) => {
         const path = spiderPrefix + '/' + spider.meta.key + '/' + spider.meta.type;
         fastify.register(spider.api, { prefix: path });
@@ -88,7 +88,7 @@ export default async function router(fastify, {db, config}) {
                     },
                     color: fastify.config.color || [],
                 };
-                const spiders = await getSpiders({db, config});
+                const spiders = await getSpiders({db, config: serverConfig});
                 spiders.forEach((spider) => {
                     let meta = Object.assign({}, spider.meta);
                     meta.api = spiderPrefix + '/' + meta.key + '/' + meta.type;

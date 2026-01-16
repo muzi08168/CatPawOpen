@@ -197,7 +197,7 @@ async function detail(inReq, _outResp) {
           .map((_, p) => p.children[0].data)
           .get();
 
-        const vodFromUrl = await _detail(shareUrls);
+        const vodFromUrl = await _detail(shareUrls, inReq);
         if (vodFromUrl){
             vod.vod_play_from = vodFromUrl.froms;
             vod.vod_play_url = vodFromUrl.urls;

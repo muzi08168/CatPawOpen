@@ -116,7 +116,7 @@ const AnimeResults = ({ animes, sourceUrl }) => {
           destroyOnClose
           closable={false}
           bodyStyle={{ padding: 0 }}
-          className='drawer'
+          rootClassName='drawer'
           extra={<Button icon={isReversed ? <SortAscendingOutlined /> : <SortDescendingOutlined />} onClick={reverseEpisodes} style={{marginLeft: 16}}/>}
         >
           <List

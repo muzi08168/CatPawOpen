@@ -14,6 +14,9 @@ export default {
     y115: {
         cookie: ''
     },
+    baidu: {
+        cookie: ''
+    },
     muou: {
         url: '',
     },

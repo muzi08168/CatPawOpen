@@ -125,7 +125,7 @@ async function detail(inReq, _outResp) {
     link = link[0].match(/https?:\/\/cloud\.189\.cn\/[^"']*/)[0];
   }
   if (isTyLink(link)) {
-    const vodFromUrl = await _detail(link);
+    const vodFromUrl = await _detail(link, inReq);
     if (vodFromUrl){
       vod.vod_play_from = vodFromUrl.froms;
       vod.vod_play_url = vodFromUrl.urls;

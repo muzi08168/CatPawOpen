@@ -5,3 +5,4 @@ export const isTyLink = (shareUrl) => getPanEnabled('tianyi') && shareUrl.includ
 export const isYdLink = (shareUrl) => getPanEnabled('yidong') && shareUrl.includes('yun.139.com')
 export const is123Link = (shareUrl) => getPanEnabled('123') && /www.123684.com|www.123865.com|www.123912.com|www.123pan.com|www.123pan.cn|www.123592.com/.test(shareUrl)
 export const is115Link = (shareUrl) => getPanEnabled('115') && /115.com|anxia.com|115cdn.com/.test(shareUrl)
+export const isBaiduLink = (shareUrl) => getPanEnabled('baidu') && /pan\.baidu\.com/.test(shareUrl)

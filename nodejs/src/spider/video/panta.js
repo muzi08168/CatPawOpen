@@ -108,7 +108,7 @@ async function detail(inReq, _outResp) {
     // 提取 a 标签中的 URL
     link = link[0].match(/https:\/\/caiyun\.139\.com\/[^"']*/)[0];
   }
-  const vodFromUrl = await _detail(link);
+  const vodFromUrl = await _detail(link, inReq);
   if (vodFromUrl){
     vod.vod_play_from = vodFromUrl.froms;
     vod.vod_play_url = vodFromUrl.urls;

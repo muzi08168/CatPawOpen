@@ -28,7 +28,7 @@ async function detail(inReq, _outResp) {
   const ids = !Array.isArray(inReq.body.id) ? [inReq.body.id] : inReq.body.id;
   const videos = [];
   for (const id of ids) {
-    const vodFromUrl = await _detail(id);
+    const vodFromUrl = await _detail(id, inReq);
     const vod = {}
     if (vodFromUrl){
       vod.vod_play_from = vodFromUrl.froms;

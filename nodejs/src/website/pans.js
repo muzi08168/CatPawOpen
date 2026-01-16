@@ -30,6 +30,11 @@ export const ALL_PANS = [
     "enable": true
   },
   {
+    "key": "baidu",
+    "name": "百度",
+    "enable": true
+  },
+  {
     "key": "ali",
     "name": "阿狸",
     "enable": true

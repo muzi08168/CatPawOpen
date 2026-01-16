@@ -200,7 +200,7 @@ async function detail(inReq, _outResp) {
       const data = await parseMessageHtml(id.replace('https://t.me', url));
       links = data.links
     }
-    const vodFromUrl = await _detail(links);
+    const vodFromUrl = await _detail(links, inReq);
     const vod = {
       vod_id: id,
     }

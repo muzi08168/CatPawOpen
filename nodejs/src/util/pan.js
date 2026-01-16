@@ -6,8 +6,9 @@ import {Cloud, initCloud} from "./cloud.js";
 import {Yun} from "./yun.js";
 import {initPan123Cloud, Pan} from "./pan123.js";
 import * as Y115 from './115.js';
+import * as Baidu from './baidu.js';
 import {videosHandle} from "./utils.js";
-import {is115Link, is123Link, isAliLink, isQuarkLink, isTyLink, isUcLink, isYdLink} from "./linkDetect.js";
+import {is115Link, is123Link, isAliLink, isBaiduLink, isQuarkLink, isTyLink, isUcLink, isYdLink} from "./linkDetect.js";
 
 export { isEmpty };
 export const ua = IOS_UA;
@@ -16,7 +17,7 @@ export async function init(inReq, _outResp) {
     return {};
 }
 
-export async function detail(shareUrls) {
+export async function detail(shareUrls, req) {
     shareUrls = !Array.isArray(shareUrls) ? [shareUrls] : shareUrls;
     const shareUrlsWithMoreInfo = shareUrls.map(url => {
         const key = getPanInfos().find(pan => pan.validator(url))?.key
@@ -89,6 +90,12 @@ export async function detail(shareUrls) {
                 froms.push(data.from);
                 urls.push(data.url);
             }
+        } else if(isBaiduLink(shareUrl)) {
+            const data = await Baidu.detail(shareUrl, req);
+            if(data && data.from && data.url){
+                froms.push(data.from);
+                urls.push(data.url);
+            }
         }
     }
     // 避免同名线路
@@ -115,6 +122,8 @@ export async function proxy(inReq, _outResp) {
         return await Quark.proxy(inReq, _outResp);
     } else if (site == 'uc') {
         return await UC.proxy(inReq, _outResp);
+    } else if (site == 'baidu') {
+        return await Baidu.proxy(inReq, _outResp);
     }
 }
 
@@ -151,6 +160,8 @@ export async function play(inReq, _outResp) {
         }
     } else if (flag.startsWith(await getPanName('115'))) {
         return await Y115.play(inReq, _outResp);
+    } else if (flag.startsWith(await getPanName('baidu'))) {
+        return await Baidu.play(inReq, _outResp);
     }
 }
 
@@ -259,4 +270,5 @@ export const getPanInfos = () =>  [
     {key: 'uc', name: getPanName('uc'), validator: isUcLink, pic: 'https://ts1.cn.mm.bing.net/th/id/R-C.421c96e47df7c9719403654ee4f7c281?rik=yiiEoGCTgDDc3w&riu=http%3a%2f%2fpic.9663.com%2fupload%2f2023-5%2f20235111411256277.png&ehk=R81N%2flXMrl%2bxpRlST8DtHXDfab6rzaMb83gihuD71Fk%3d&risl=&pid=ImgRaw&r=0'},
     {key: 'ali', name: getPanName('ali'), validator: isAliLink, pic: 'https://inews.gtimg.com/newsapp_bt/0/13263837859/1000'},
     {key: '123', name: getPanName('123'), validator: is123Link, pic: 'https://statics.123957.com/static/favicon.ico'},
+    {key: 'baidu', name: getPanName('baidu'), validator: isBaiduLink, pic: 'https://nd-static.bdstatic.com/m-static/disk-home/img/logo.png'},
 ]
